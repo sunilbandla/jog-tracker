@@ -1,0 +1,78 @@
+<navbar></navbar>
+
+<header class="hero-unit" id="banner">
+  <div class="container">
+    <h1>Reports</h1>
+  </div>
+</header>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8">
+      <h1 class="page-header">Reports</h1>
+    </div>
+  </div>
+
+  <form class="form row" name="searchForm" ng-submit="reports.search(searchForm)" novalidate>
+    <div class="col-lg-3 form-group"
+         ng-class="{ 'has-success': searchForm.fromDate.$valid && reports.submitted,
+                     'has-error': searchForm.fromDate.$invalid && reports.submitted }">
+      <label>From Date</label>
+      <div class="input-group calendar-control">
+        <span class="input-group-addon btn-calendar">
+            <i class="glyphicon glyphicon-calendar"></i>
+        </span>
+        <input class="form-control" id="fromDate" type="date" name="fromDate"
+               placeholder="mm/dd/yyyy" ng-required="true"
+               ng-model="reports.searchParams.from" />
+      </div>
+
+      <p class="help-block" ng-show="searchForm.fromDate.$error.required && reports.submitted">
+        From date is required
+      </p>
+    </div>
+
+    <div class="col-lg-3 form-group"
+         ng-class="{ 'has-success': searchForm.toDate.$valid && reports.submitted,
+                     'has-error': searchForm.toDate.$invalid && reports.submitted }">
+      <label>To Date</label>
+      <div class="input-group calendar-control">
+        <span class="input-group-addon btn-calendar">
+            <i class="glyphicon glyphicon-calendar"></i>
+        </span>
+        <input class="form-control" id="toDate" type="date" name="toDate"
+               placeholder="mm/dd/yyyy" ng-required="true"
+               ng-model="reports.searchParams.to" />
+      </div>
+
+      <p class="help-block" ng-show="searchForm.toDate.$error.required && reports.submitted">
+        To date is required
+      </p>
+    </div>
+
+    <div class="col-lg-3">
+      <button class="btn btn-default search" type="submit">
+        Search
+      </button>
+    </div>
+  </form>
+  <hr>
+  <div class="row">
+    <div class="col-lg-12" ng-show="reports.report">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Total Distance (in miles)</th>
+            <th>Avg. Speed (in miles/minutes)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ reports.report.totalDistance | number }}</td>
+            <td>{{ reports.report.averageSpeed | number:2 }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

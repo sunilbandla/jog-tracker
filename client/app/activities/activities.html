@@ -1,0 +1,240 @@
+<navbar></navbar>
+
+<header class="hero-unit" id="banner">
+  <div class="container">
+    <h1>Activities</h1>
+  </div>
+</header>
+
+<div class="container" ng-show="activities.showList">
+  <div class="row">
+    <div class="col-lg-8">
+      <h1 class="page-header">Activities</h1>
+    </div>
+    <div class="col-lg-12">
+      <alert ng-repeat="alert in activities.alerts" type="{{alert.type}}"
+             close="activities.closeAlert($index)">{{alert.msg}}</alert>
+    </div>
+  </div>
+
+  <form class="form row" name="searchForm" ng-submit="activities.search()" novalidate>
+    <div class="col-lg-3 form-group"
+         ng-class="{ 'has-success': searchForm.fromDate.$valid && activities.submitted,
+                     'has-error': searchForm.fromDate.$invalid && activities.submitted }">
+      <label>From Date</label>
+      <div class="input-group calendar-control">
+        <span class="input-group-addon btn-calendar">
+            <i class="glyphicon glyphicon-calendar"></i>
+        </span>
+        <input class="form-control" id="fromDate" type="date" name="fromDate"
+               placeholder="mm/dd/yyyy"
+               ng-model="activities.searchParams.from" />
+      </div>
+    </div>
+
+    <div class="col-lg-3 form-group"
+         ng-class="{ 'has-success': searchForm.toDate.$valid && activities.submitted,
+                     'has-error': searchForm.toDate.$invalid && activities.submitted }">
+      <label>To Date</label>
+      <div class="input-group calendar-control">
+        <span class="input-group-addon btn-calendar">
+            <i class="glyphicon glyphicon-calendar"></i>
+        </span>
+        <input class="form-control" id="toDate" type="date" name="toDate"
+               placeholder="mm/dd/yyyy"
+               ng-model="activities.searchParams.to" />
+      </div>
+    </div>
+
+    <div class="col-lg-3">
+      <button class="btn btn-default search" type="submit">
+        Search
+      </button>
+    </div>
+    <div class="col-lg-3">
+      <button class="btn btn-primary btn-lg pull-right" type="button"
+              ng-click="activities.toggleAddForm()">
+        Add activity
+      </button>
+    </div>
+  </form>
+  <hr>
+  <div class="row">
+    <div class="col-lg-12" ng-hide="activities.activities.length">
+      There are no activities.
+    </div>
+    <div class="col-lg-12" ng-show="activities.activities.length">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Distance (in miles)</th>
+            <th>Duration (in minutes)</th>
+            <th>Avg. Speed (in miles/minutes)</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="activity in activities.activities">
+            <td>{{ activity.activityDate | date:'mediumDate' }}</td>
+            <td>{{ activity.distance | number }}</td>
+            <td>{{ activity.duration | number }}</td>
+            <td>{{ activity.distance/activity.duration | number:2 }}</td>
+            <td title="Update">
+              <button class="fa fa-edit fa-lg btn btn-link"
+                   ng-click="activities.goToUpdate(activity)"></button>
+            </td>
+            <td title="Remove">
+                <button class="fa fa-trash fa-lg btn btn-link"
+                      ng-click="activities.delete(activity)"></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="container" ng-show="activities.showAddForm">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1>Add activity</h1>
+    </div>
+    <div class="col-sm-12">
+      <form class="form" name="form" ng-submit="activities.add(form)" novalidate>
+
+        <div class="form-group" ng-class="{ 'has-success': form.date.$valid && activities.submitted,
+                                            'has-error': form.date.$invalid && activities.submitted }">
+          <label>Activity Date</label>
+          <div class="input-group calendar-control">
+            <span class="input-group-addon btn-calendar">
+                <i class="glyphicon glyphicon-calendar"></i>
+            </span>
+            <input class="form-control" id="activityDate" type="date"
+                   placeholder="mm/dd/yyyy"
+                   ng-model="activities.newActivity.activityDate" />
+          </div>
+
+          <p class="help-block" ng-show="form.date.$error.required && activities.submitted">
+            Activity date is required
+          </p>
+        </div>
+
+        <div class="form-group" ng-class="{ 'has-success': form.distance.$valid && activities.submitted,
+                                            'has-error': form.distance.$invalid && activities.submitted }">
+          <label>Distance in miles</label>
+
+          <input type="text" name="distance" class="form-control" ng-model="activities.newActivity.distance"
+                 required
+                 mongoose-error/>
+          <p class="help-block" ng-show="form.distance.$error.required && activities.submitted">
+            What was your activity distance?
+          </p>
+          <p class="help-block" ng-show="form.distance.$error.mongoose">
+            {{ activities.errors.distance }}
+          </p>
+        </div>
+
+        <div class="form-group" ng-class="{ 'has-success': form.duration.$valid && activities.submitted,
+                                            'has-error': form.duration.$invalid && activities.submitted }">
+          <label>Duration in minutes</label>
+
+          <input type="text" name="duration" class="form-control" ng-model="activities.newActivity.duration"
+                 required
+                 mongoose-error/>
+          <p class="help-block"
+             ng-show="(form.duration.$error.minlength || form.duration.$error.required) && activities.submitted">
+            What was the duration?
+          </p>
+          <p class="help-block" ng-show="form.duration.$error.mongoose">
+            {{ activities.errors.duration }}
+          </p>
+        </div>
+
+        <div>
+          <button class="btn btn-primary btn-lg" type="submit">
+            Add activity
+          </button>
+          <button class="btn btn-default btn-lg" type="button" ng-click="activities.toggleAddForm()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <hr>
+</div>
+
+<div class="container" ng-show="activities.showUpdateForm">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1>Update activity</h1>
+    </div>
+    <div class="col-sm-12">
+      <form class="form" name="updateForm" ng-submit="activities.update(updateForm)" novalidate>
+
+        <div class="form-group" ng-class="{ 'has-success': updateForm.date.$valid && activities.submitted,
+                                            'has-error': updateForm.date.$invalid && activities.submitted }">
+          <label>Activity Date</label>
+          <div class="input-group calendar-control">
+            <span class="input-group-addon btn-calendar">
+                <i class="glyphicon glyphicon-calendar"></i>
+            </span>
+            <input class="form-control" id="updateActivityDate" type="date" name="date"
+                   placeholder="mm/dd/yyyy"
+                   ng-model="activities.updateActivity.activityDate" />
+          </div>
+
+          <p class="help-block" ng-show="updateForm.date.$error.required && activities.submitted">
+            Activity date is required
+          </p>
+        </div>
+
+        <div class="form-group" ng-class="{ 'has-success': updateForm.distance.$valid && activities.submitted,
+                                            'has-error': updateForm.distance.$invalid && activities.submitted }">
+          <label>Distance in miles</label>
+
+          <input type="text" name="distance" class="form-control" ng-model="activities.updateActivity.distance"
+                 required
+                 mongoose-error/>
+          <p class="help-block" ng-show="updateForm.distance.$error.required && activities.submitted">
+            What was your activity distance?
+          </p>
+          <p class="help-block" ng-show="updateForm.distance.$error.mongoose">
+            {{ activities.errors.distance }}
+          </p>
+        </div>
+
+        <div class="form-group" ng-class="{ 'has-success': updateForm.duration.$valid && activities.submitted,
+                                            'has-error': updateForm.duration.$invalid && activities.submitted }">
+          <label>Duration in minutes</label>
+
+          <input type="text" name="duration" class="form-control" ng-model="activities.updateActivity.duration"
+                 required
+                 mongoose-error/>
+          <p class="help-block"
+             ng-show="(updateForm.duration.$error.minlength ||
+              updateForm.duration.$error.required) && activities.submitted">
+            What was the duration?
+          </p>
+          <p class="help-block" ng-show="updateForm.duration.$error.mongoose">
+            {{ activities.errors.duration }}
+          </p>
+        </div>
+
+        <div>
+          <button class="btn btn-primary btn-lg" type="submit">
+            Update activity
+          </button>
+          <button class="btn btn-default btn-lg" type="button" ng-click="activities.toggleUpdateForm()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <hr>
+</div>
+
+<footer></footer>
